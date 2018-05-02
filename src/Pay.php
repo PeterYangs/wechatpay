@@ -8,6 +8,8 @@
 
 namespace wechatPay;
 
+use Endroid\QrCode\QrCode;
+
 class Pay
 {
 
@@ -35,9 +37,10 @@ class Pay
      * 扫码支付
      * Create by Peter
      * @param $order_no
-     * @param string $notify_url
+     * @param $notify_url
      * @param string $ip
-     * @return array|mixed|string
+     * @return bool
+     * @throws \Endroid\QrCode\Exception\InvalidWriterException
      */
     function for_NATIVE($order_no, $notify_url, $ip = '')
     {
@@ -77,7 +80,12 @@ class Pay
         $data = $this->xmlToArray($re);
 
 
-        return $data;
+        if($data['return_code']!=="SUCCESS") return false;
+
+        $qr=new QrCode($data['code_url']);
+        header('Content-Type: '.$qr->getContentType());
+        echo $qr->writeString();
+        exit();
 
     }
 

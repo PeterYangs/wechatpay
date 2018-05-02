@@ -9,7 +9,9 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "endroid/qr-code": "^2.5"
+    },
     "autoload": {
         "psr-4": {
             "wechatPay\\": "src/"
