@@ -65,7 +65,6 @@ class Pay
         ];
 
 
-
         $signature = $this->get_signature_for_pay($data);
 
 
@@ -80,14 +79,107 @@ class Pay
         $data = $this->xmlToArray($re);
 
 
-        if($data['return_code']!=="SUCCESS") return false;
+        if ($data['return_code'] !== "SUCCESS") return false;
 
-        $qr=new QrCode($data['code_url']);
-        header('Content-Type: '.$qr->getContentType());
+        $qr = new QrCode($data['code_url']);
+        header('Content-Type: ' . $qr->getContentType());
         echo $qr->writeString();
         exit();
 
     }
+
+
+    /**
+     * 公众号支付
+     * Create by Peter
+     */
+    function for_jspay($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url)
+    {
+
+        $re=$this->get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url);
+
+        $data=[
+            'appId'=>$this->appid,
+            'timeStamp'=>time(),
+            'nonceStr'=>$this->get_noncestr(),
+            'package'=>'prepay_id='.$re['prepay_id'],
+            'signType'=>'MD5',
+
+        ];
+
+        $paySign=$this->get_signature_for_pay($data);
+
+
+        $data['paySign']=$paySign;
+
+        return $data;
+
+
+    }
+
+
+    /**
+     * 统一下单(公众号支付使用)
+     * Create by Peter
+     * @param $body  string 商品描述
+     * @param $out_trade_no string 订单号
+     * @param $total_fee int 商品金额，单位为分
+     * @param $openid string openid
+     * @param $ip  string 客户端ip
+     * @param $notify_url string 支付回调地址
+     * @return array|string
+     * @throws \Exception
+     */
+    private function get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url)
+    {
+
+        $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+
+
+        $data = [
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'nonce_str' => $this->get_noncestr(),
+            'body' => $body, //商品描述
+            'out_trade_no' => $out_trade_no,
+            'total_fee' => $total_fee,
+            'spbill_create_ip' => $ip,
+            'notify_url' => $notify_url,
+            'trade_type' => 'JSAPI',
+            'openid' => $ip
+        ];
+
+        $signature=$this->get_signature_for_pay($data);
+
+        $data['sign']=$signature;
+
+        //转xml格式
+        $data=$this->arrayToXml($data);
+
+        $re=$this->postXmlCurl($data,$url);
+
+
+        $arr=$this->xmlToArray($re);
+
+        if($arr['return_code']!="SUCCESS"||$arr['result_code']!="SUCCESS"){
+
+
+//            return json_encode([]);
+            throw new \Exception($re['return_msg']);
+
+
+        }
+
+
+        return $data;
+
+
+
+
+
+
+    }
+
 
     /**
      * 微信支付获取签名
@@ -165,7 +257,7 @@ class Pay
      * @param int $second
      * @return bool|mixed
      */
-   private function postXmlCurl($xml, $url, $useCert = false, $second = 30)
+    private function postXmlCurl($xml, $url, $useCert = false, $second = 30)
     {
         $ch = curl_init();
         //设置超时
@@ -246,22 +338,23 @@ class Pay
      * Create by Peter
      * @return bool|mixed
      */
-    function check(){
+    function check()
+    {
 
 
-        $data=$GLOBALS['HTTP_RAW_POST_DATA'];
+        $data = $GLOBALS['HTTP_RAW_POST_DATA'];
 
-        $data=$this->xmlToArray($data);
+        $data = $this->xmlToArray($data);
 
 
-        $sign=$data['sign'];
+        $sign = $data['sign'];
 
-        if(!$sign) return false;
+        if (!$sign) return false;
 
         unset($data['sign']);
-        $s=$this->get_signature_for_pay($data);
+        $s = $this->get_signature_for_pay($data);
 
-        if(strtolower($s)==strtolower($sign)) return $data;
+        if (strtolower($s) == strtolower($sign)) return $data;
 
 
         return false;
