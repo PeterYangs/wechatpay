@@ -1,6 +1,6 @@
 {
     "name": "peteryangs/wechatpay",
-    "description": "wechat psy sdk",
+    "description": "wechat pay sdk",
     "type": "sdk",
     "authors": [
         {
