@@ -90,8 +90,16 @@ class Pay
 
 
     /**
-     * 公众号支付
+     * 公众号支付（js支付）
      * Create by Peter
+     * @param $body
+     * @param $out_trade_no
+     * @param $total_fee
+     * @param $openid
+     * @param $ip
+     * @param $notify_url
+     * @return array
+     * @throws \Exception
      */
     function for_jspay($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url)
     {
@@ -165,7 +173,7 @@ class Pay
 
 
 //            return json_encode([]);
-            throw new \Exception($re['return_msg']);
+            throw new \Exception($arr['return_msg']);
 
 
         }
