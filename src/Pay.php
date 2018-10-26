@@ -154,7 +154,7 @@ class Pay
             'spbill_create_ip' => $ip,
             'notify_url' => $notify_url,
             'trade_type' => 'JSAPI',
-            'openid' => $ip
+            'openid' => $openid,
         ];
 
         $signature=$this->get_signature_for_pay($data);
