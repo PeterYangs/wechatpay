@@ -173,7 +173,7 @@ class Pay
 
 
 //            return json_encode([]);
-            throw new \Exception($arr['return_msg']);
+            throw new \Exception(json_encode($arr));
 
 
         }
