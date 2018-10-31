@@ -2,6 +2,7 @@
     "name": "peteryangs/wechatpay",
     "description": "wechat pay sdk",
     "type": "sdk",
+    "license": "MIT",
     "authors": [
         {
             "name": "PeterYangs",
