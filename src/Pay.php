@@ -39,10 +39,11 @@ class Pay
      * @param $order_no
      * @param $notify_url
      * @param string $ip
+     * @param string $attach
      * @return bool
      * @throws \Endroid\QrCode\Exception\InvalidWriterException
      */
-    function for_NATIVE($order_no, $notify_url, $ip = '')
+    function for_NATIVE($order_no, $notify_url, $ip = '',$attach='')
     {
 
         if (!$ip) $ip = $_SERVER['REMOTE_ADDR'];
@@ -60,7 +61,8 @@ class Pay
             'spbill_create_ip' => $ip,
             'notify_url' => $notify_url,
             'trade_type' => 'NATIVE',
-            'product_id' => time()
+            'product_id' => time(),
+            'attach'=>$attach
 
         ];
 
@@ -98,13 +100,14 @@ class Pay
      * @param $openid
      * @param $ip
      * @param $notify_url
+     * @param $attach
      * @return array
      * @throws \Exception
      */
-    function for_jspay($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url)
+    function for_jspay($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url,$attach='')
     {
 
-        $re=$this->get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url);
+        $re=$this->get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url,$attach);
 
         $data=[
             'appId'=>$this->appid,
@@ -135,10 +138,11 @@ class Pay
      * @param $openid string openid
      * @param $ip  string 客户端ip
      * @param $notify_url string 支付回调地址
+     * @param $attach string 附加数据
      * @return array|string
      * @throws \Exception
      */
-    private function get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url)
+    private function get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url,$attach='')
     {
 
         $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
@@ -155,6 +159,7 @@ class Pay
             'notify_url' => $notify_url,
             'trade_type' => 'JSAPI',
             'openid' => $openid,
+            'attach'=>$attach
         ];
 
         $signature=$this->get_signature_for_pay($data);
