@@ -354,8 +354,20 @@ class Pay
     function check()
     {
 
+        $php_version=PHP_MAJOR_VERSION;
 
-        $data = $GLOBALS['HTTP_RAW_POST_DATA'];
+        if($php_version==7){
+
+            $data=file_get_contents('php://input');
+
+        }else{
+
+            $data = $GLOBALS['HTTP_RAW_POST_DATA'];
+        }
+
+
+
+
 
         $data = $this->xmlToArray($data);
 
