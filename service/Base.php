@@ -1,16 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2018/5/2 0002
- * Time: 13:47
- */
 
-namespace wechatPay;
 
-use Endroid\QrCode\QrCode;
+namespace Service;
 
-class Pay
+
+class Base
 {
 
     //公众号appid
@@ -27,114 +21,6 @@ class Pay
 
     protected $key_path='';
 
-    function __construct($appid, $mch_id, $key,$cert_path='',$key_path='')
-    {
-
-
-        $this->appid = $appid;
-        $this->mch_id = $mch_id;
-        $this->key = $key;
-
-        $this->cert_path=$cert_path;
-
-        $this->key_path=$key_path;
-    }
-
-    /**
-     * 扫码支付
-     * Create by Peter
-     * @param $order_no
-     * @param $notify_url
-     * @param string $ip
-     * @param string $attach
-     * @return bool
-     * @throws \Endroid\QrCode\Exception\InvalidWriterException
-     */
-    function for_NATIVE($order_no, $notify_url, $ip = '',$attach='')
-    {
-
-        if (!$ip) $ip = $_SERVER['REMOTE_ADDR'];
-
-
-        $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
-
-        $data = [
-            'appid' => $this->appid,
-            'mch_id' => $this->mch_id,
-            'nonce_str' => $this->get_noncestr(),
-            'body' => '扫码支付测试',
-            'out_trade_no' => $order_no . "_" . mt_rand(1000, 9999),
-            'total_fee' => 1,
-            'spbill_create_ip' => $ip,
-            'notify_url' => $notify_url,
-            'trade_type' => 'NATIVE',
-            'product_id' => time(),
-            'attach'=>$attach
-
-        ];
-
-
-        $signature = $this->get_signature_for_pay($data);
-
-
-        $data['sign'] = $signature;
-
-
-        $data = $this->arrayToXml($data);
-
-
-        $re = $this->postXmlCurl($data, $url);
-
-        $data = $this->xmlToArray($re);
-
-
-        if ($data['return_code'] !== "SUCCESS") return false;
-
-        $qr = new QrCode($data['code_url']);
-        header('Content-Type: ' . $qr->getContentType());
-        echo $qr->writeString();
-        exit();
-
-    }
-
-
-    /**
-     * 公众号支付（js支付）
-     * Create by Peter
-     * @param $body
-     * @param $out_trade_no
-     * @param $total_fee
-     * @param $openid
-     * @param $ip
-     * @param $notify_url
-     * @param $attach
-     * @return array
-     * @throws \Exception
-     */
-    function for_jspay($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url,$attach='')
-    {
-
-        $re=$this->get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url,$attach);
-
-        $data=[
-            'appId'=>$this->appid,
-            'timeStamp'=>time(),
-            'nonceStr'=>$this->get_noncestr(),
-            'package'=>'prepay_id='.$re['prepay_id'],
-            'signType'=>'MD5',
-
-        ];
-
-        $paySign=$this->get_signature_for_pay($data);
-
-
-        $data['paySign']=$paySign;
-
-        return $data;
-
-
-    }
-
 
     /**
      * 统一下单(公众号支付使用)
@@ -149,7 +35,7 @@ class Pay
      * @return array|string
      * @throws \Exception
      */
-    private function get_unifiedorder($body,$out_trade_no,$total_fee,$openid,$ip,$notify_url,$attach='')
+    protected function get_unifiedorder($body,$out_trade_no,$total_fee,$ip,$notify_url,$openid='',$attach='')
     {
 
         $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
@@ -193,13 +79,7 @@ class Pay
 
         return $arr;
 
-
-
-
-
-
     }
-
 
     /**
      * 微信支付获取签名
@@ -207,7 +87,7 @@ class Pay
      * @param array $param
      * @return bool|string
      */
-    private function get_signature_for_pay(array $param)
+    protected function get_signature_for_pay(array $param)
     {
 
         ksort($param);
@@ -231,7 +111,6 @@ class Pay
 
     }
 
-
     /**
      * 数组转XML
      * Create by Peter
@@ -251,7 +130,6 @@ class Pay
         $xml .= "</xml>";
         return $xml;
     }
-
 
     /**
      * xml转数组
@@ -353,6 +231,7 @@ class Pay
              </xml>";
     }
 
+
     /**
      * 验证签名
      * Create by Peter
@@ -401,19 +280,19 @@ class Pay
 
     }
 
-    function refund(){
 
-        $url='https://api.mch.weixin.qq.com/secapi/pay/refund';
+    public function __construct($appid, $mch_id, $key, $cert_path = '', $key_path = '')
+    {
 
+        $this->appid=$appid;
 
-        $data=[
-            'appid'=>$this->appid,
+        $this->mch_id=$mch_id;
 
+        $this->key=$key;
 
+        $this->cert_path=$cert_path;
 
-        ];
-
-
+        $this->key_path=$key_path;
 
     }
 
