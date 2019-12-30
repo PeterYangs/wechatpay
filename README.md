@@ -13,9 +13,9 @@ include '../vendor/autoload.php';
 
 //实例化
 $pay = new WeChatPay(
-    'wxe3aa6306237e5490',
-    '1419420702',
-    'TmCYxrZjr910YSPywLhMCeRnRGYPsm9x',
+    'xxxx',
+    'xxx',
+    'xxxxxxxxxxxxx',
     __DIR__.DIRECTORY_SEPARATOR.'apiclient_cert.pem',
     __DIR__.DIRECTORY_SEPARATOR.'apiclient_key.pem'
 );
