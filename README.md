@@ -69,3 +69,5 @@ $data=$weapp->check_refund();
 
 echo $weapp->return_success();
 ```
+
+#### 其他支付完善中。。。。
