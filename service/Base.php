@@ -117,7 +117,7 @@ class Base
      * @param $arr
      * @return string
      */
-    private function arrayToXml($arr)
+    protected function arrayToXml($arr)
     {
         $xml = "<xml>";
         foreach ($arr as $key => $val) {
@@ -137,7 +137,7 @@ class Base
      * @param $xml
      * @return mixed
      */
-    private function xmlToArray($xml)
+    protected function xmlToArray($xml)
     {
         //禁止引用外部xml实体
         libxml_disable_entity_loader(true);
@@ -149,13 +149,16 @@ class Base
     /**
      * 接口请求
      * Create by Peter
+     * 2019/12/30 08:56:14
+     * Email:904801074@qq.com
      * @param $xml
      * @param $url
      * @param bool $useCert
      * @param int $second
-     * @return bool|mixed
+     * @return bool|string
+     * @throws \Exception
      */
-    private function postXmlCurl($xml, $url, $useCert = false, $second = 30)
+    protected function postXmlCurl($xml, $url, $useCert = false, $second = 30)
     {
         $ch = curl_init();
         //设置超时
@@ -170,10 +173,10 @@ class Base
         if ($useCert == true) {
             //设置证书
             //使用证书：cert 与 key 分别属于两个.pem文件
-            curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
-            //curl_setopt($ch,CURLOPT_SSLCERT, WxPayConfig::SSLCERT_PATH);
-            curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
-            //curl_setopt($ch,CURLOPT_SSLKEY, WxPayConfig::SSLKEY_PATH);
+//            curl_setopt($ch, CURLOPT_SSLCERTTYPE, $this->cert_path);
+            curl_setopt($ch,CURLOPT_SSLCERT, $this->cert_path);
+//            curl_setopt($ch, CURLOPT_SSLKEYTYPE, $this->key_path);
+            curl_setopt($ch,CURLOPT_SSLKEY, $this->key_path);
         }
         //post提交方式
         curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -185,9 +188,12 @@ class Base
             curl_close($ch);
             return $data;
         } else {
-            $error = curl_errno($ch);
+            $error = curl_error($ch);
             curl_close($ch);
-            return false;
+
+            throw new \Exception($error);
+
+//            return false;
         }
     }
 
@@ -232,6 +238,16 @@ class Base
     }
 
 
+    function return_success(){
+
+
+        return "<xml>
+                <return_code><![CDATA[SUCCESS]]></return_code>
+                <return_msg><![CDATA[OK]]></return_msg>
+             </xml>";
+    }
+
+
     /**
      * 验证签名
      * Create by Peter
@@ -262,7 +278,7 @@ class Base
 
     }
 
-    private function getData(){
+    protected function getData(){
 
         $php_version=PHP_MAJOR_VERSION;
 

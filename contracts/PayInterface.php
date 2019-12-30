@@ -16,4 +16,10 @@ interface PayInterface
 
     function check();
 
+    function check_refund($data=null);
+
+    function return_success();
+
+
+
 }
