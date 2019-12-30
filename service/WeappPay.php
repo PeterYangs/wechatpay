@@ -111,7 +111,11 @@ class WeappPay extends Base implements PayInterface
 
         $md5_key=md5($this->key);
 
-        return $this->xmlToArray(openssl_decrypt($req_info , 'aes-256-ecb', $md5_key, OPENSSL_RAW_DATA));
+         $res=$this->xmlToArray(openssl_decrypt($req_info , 'aes-256-ecb', $md5_key, OPENSSL_RAW_DATA));
+
+         if(is_array($res)) return $res;
+
+         return false;
 
     }
 
